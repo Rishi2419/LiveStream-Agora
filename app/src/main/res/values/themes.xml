@@ -1,9 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.LiveStream" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-    </style>
+    <style name="Theme.AgoraDualCameraStream" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <!-- Customize your theme here -->
 
-    <style name="Theme.LiveStream" parent="Base.Theme.LiveStream" />
+        <item name="colorOnPrimary">@color/orange</item>
+        <item name="colorOnSecondary">@color/pink</item>
+    </style>
 </resources>

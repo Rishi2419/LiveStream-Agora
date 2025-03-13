@@ -8,6 +8,21 @@
     android:layout_height="match_parent"
     tools:context=".CallActivity">
 
+    <TextView
+        android:id="@+id/timerTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="00:00"
+        android:textSize="16sp"
+        android:textColor="@android:color/white"
+        android:background="@drawable/timer_background"
+        android:padding="8dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"/>
+
     <!-- Fullscreen Video Frame -->
     <FrameLayout
         android:id="@+id/fullscreenFrameLayout"
@@ -18,26 +33,50 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-
+    <!-- Front Camera Preview -->
     <FrameLayout
         android:id="@+id/frontCameraFrameLayout"
         android:layout_width="120dp"
         android:layout_height="160dp"
-        android:layout_margin="16dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="100dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:background="@android:color/black" />
 
-
-    <!-- Leave Call Button -->
-    <Button
-        android:id="@+id/btnLeave"
+    <!-- Button Container -->
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Leave Call"
+        android:orientation="horizontal"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp">
+
+        <ImageButton
+            android:id="@+id/btnMic"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/circular"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_mic"
+            android:contentDescription="Mute/Unmute Mic"
+            android:tint="@android:color/white"
+            android:layout_marginEnd="20dp"/>
+
+        <!-- Leave Call Button -->
+        <ImageButton
+            android:id="@+id/btnLeave"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/circular"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_call_end"
+            android:contentDescription="Leave Call"
+            android:tint="@android:color/white"/>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
