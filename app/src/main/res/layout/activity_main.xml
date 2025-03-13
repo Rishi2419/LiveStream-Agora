@@ -5,24 +5,16 @@
     android:gravity="center"
     android:padding="16dp">
 
-    <FrameLayout
-        android:id="@+id/frameLayout"
-        android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:background="@android:color/darker_gray" />
-
     <Button
         android:id="@+id/btnJoinAsHost"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Join as Host"
-        android:layout_marginTop="20dp" />
+        android:text="Join as Host" />
 
     <Button
         android:id="@+id/btnJoinAsAudience"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Join as Audience"
-        android:layout_marginTop="20dp"/>
+        android:text="Join as Audience" />
 
 </LinearLayout>
