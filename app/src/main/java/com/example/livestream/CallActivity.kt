@@ -18,7 +18,8 @@ class CallActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCallBinding
     private var agoraEngine: RtcEngine? = null
     private var isHost = false
-    private var localSurfaceView: SurfaceView? = null
+    private var rearCameraView: SurfaceView? = null
+    private var frontCameraView: SurfaceView? = null
     private var remoteSurfaceView: SurfaceView? = null
 
     private val appId = "2298ff7865d14062afec8e8cedd5daf5"
@@ -65,8 +66,10 @@ class CallActivity : AppCompatActivity() {
             config.mEventHandler = object : IRtcEngineEventHandler() {
                 override fun onUserJoined(uid: Int, elapsed: Int) {
                     runOnUiThread {
-                        if (!isHost) {
-                            setupRemoteVideo(uid)
+                        if (uid == 0) {
+                            setupRemoteVideo(uid) // Rear camera (Fullscreen)
+                        } else {
+                            setupRemoteFrontVideo(uid) // Front camera (Smaller Frame)
                         }
                     }
                 }
@@ -98,36 +101,62 @@ class CallActivity : AppCompatActivity() {
         agoraEngine!!.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
         agoraEngine!!.setClientRole(Constants.CLIENT_ROLE_BROADCASTER)
 
-        // Force Agora to use the **rear camera**
+        // Setup both cameras
+        setupRearCamera()
+        setupFrontCamera()
+
+        agoraEngine!!.startPreview()
+        agoraEngine!!.joinChannel(token, channelName, uid, ChannelMediaOptions())
+    }
+
+    private fun setupRearCamera() {
+        if (rearCameraView == null) {
+            rearCameraView = SurfaceView(this)
+            binding.fullscreenFrameLayout.addView(rearCameraView)
+        }
+
+        // Use rear camera
         val cameraConfig = CameraCapturerConfiguration(
             CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_REAR
         )
         agoraEngine!!.setCameraCapturerConfiguration(cameraConfig)
 
-        setupLocalVideo()  // Setup the local video AFTER setting camera configuration
-
-        localSurfaceView!!.visibility = SurfaceView.VISIBLE
-        agoraEngine!!.startPreview()
-        agoraEngine!!.joinChannel(token, channelName, uid, ChannelMediaOptions())
+        agoraEngine!!.setupLocalVideo(
+            VideoCanvas(rearCameraView, VideoCanvas.RENDER_MODE_FIT, 0)
+        )
     }
 
+    private fun setupFrontCamera() {
+        if (frontCameraView == null) {
+            frontCameraView = SurfaceView(this)
+            binding.frontCameraFrameLayout.addView(frontCameraView)
+        }
+
+        // Use front camera
+        val frontCameraConfig = CameraCapturerConfiguration(
+            CameraCapturerConfiguration.CAMERA_DIRECTION.CAMERA_FRONT
+        )
+        agoraEngine!!.setCameraCapturerConfiguration(frontCameraConfig)
+
+        agoraEngine!!.setupLocalVideo(
+            VideoCanvas(frontCameraView, VideoCanvas.RENDER_MODE_HIDDEN, uid+1) // Use different uid
+        )
+    }
+    private fun setupRemoteFrontVideo(uid: Int) {
+        val frontSurfaceView = SurfaceView(this)
+        binding.frontCameraFrameLayout.removeAllViews()
+        binding.frontCameraFrameLayout.addView(frontSurfaceView)
+
+        agoraEngine!!.setupRemoteVideo(
+            VideoCanvas(frontSurfaceView, VideoCanvas.RENDER_MODE_HIDDEN, uid)
+        )
+    }
 
 
     private fun joinChannelAsAudience() {
         agoraEngine!!.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
         agoraEngine!!.setClientRole(Constants.CLIENT_ROLE_AUDIENCE)
         agoraEngine!!.joinChannel(token, channelName, uid, ChannelMediaOptions())
-    }
-
-    private fun setupLocalVideo() {
-        if (localSurfaceView == null) {
-            localSurfaceView = SurfaceView(this)
-            binding.fullscreenFrameLayout.addView(localSurfaceView)
-        }
-
-        agoraEngine!!.setupLocalVideo(
-            VideoCanvas(localSurfaceView, VideoCanvas.RENDER_MODE_FIT, 0)
-        )
     }
 
     private fun setupRemoteVideo(uid: Int) {
