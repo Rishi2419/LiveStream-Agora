@@ -28,6 +28,9 @@
         android:theme="@style/Theme.AgoraDualCameraStream"
         tools:targetApi="31">
         <activity
+            android:name=".Chatactivity"
+            android:exported="false" />
+        <activity
             android:name=".CallActivity"
             android:exported="false" />
         <activity

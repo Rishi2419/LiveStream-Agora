@@ -1,7 +1,11 @@
 package com.example.livestream
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
 import android.util.Log
 import android.view.SurfaceView
 import android.view.View
@@ -25,6 +29,11 @@ class CallActivity : AppCompatActivity() {
     private var rearCameraView: SurfaceView? = null
     private var frontCameraView: SurfaceView? = null
     private var remoteSurfaceView: SurfaceView? = null
+
+    private var startTime: Long = 0
+    private var timerRunning = false
+    private val handler = Handler(Looper.getMainLooper())
+    private lateinit var timerRunnable: Runnable
 
     // Front camera helper
     private var frontCameraHelper: FrontCameraHelper? = null
@@ -56,6 +65,8 @@ class CallActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, REQUESTED_PERMISSION, PERMISSION_ID)
         }
 
+        initializeTimer()
+        startTimer()
         // Initialize views for cameras
         rearCameraView = SurfaceView(this)
         binding.fullscreenFrameLayout.addView(rearCameraView)
@@ -69,6 +80,11 @@ class CallActivity : AppCompatActivity() {
             leaveCall()
         }
 
+        binding.btnchat.setOnClickListener{
+            val intent = Intent(this, Chatactivity::class.java)
+            startActivity(intent)
+        }
+
 
     }
 
@@ -76,6 +92,48 @@ class CallActivity : AppCompatActivity() {
         return !(ContextCompat.checkSelfPermission(this, REQUESTED_PERMISSION[0]) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, REQUESTED_PERMISSION[1]) != PackageManager.PERMISSION_GRANTED)
     }
+
+    private fun initializeTimer() {
+        // Define the timer runnable
+        timerRunnable = object : Runnable {
+            override fun run() {
+                val elapsedTime = SystemClock.elapsedRealtime() - startTime
+                val seconds = (elapsedTime / 1000).toInt() % 60
+                val minutes = (elapsedTime / (1000 * 60)).toInt()
+
+                // Format the time as "MM:SS"
+                val timeString = String.format("%02d:%02d", minutes, seconds)
+
+                // Update the timer text
+                binding.timerTextView.text = timeString
+
+                // Schedule the next update in 1 second
+                handler.postDelayed(this, 1000)
+            }
+        }
+    }
+
+    private fun startTimer() {
+        if (!timerRunning) {
+            startTime = SystemClock.elapsedRealtime()
+            handler.post(timerRunnable)
+            timerRunning = true
+        }
+    }
+
+    private fun stopTimer() {
+        if (timerRunning) {
+            handler.removeCallbacks(timerRunnable)
+            timerRunning = false
+        }
+    }
+
+    private fun resetTimer() {
+        stopTimer()
+        binding.timerTextView.text = "00:00"
+    }
+
+
 
     private fun setupAgoraEngine() {
         try {
@@ -219,6 +277,7 @@ class CallActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        stopTimer()
 
         // Clean up front camera helper
         frontCameraHelper?.stopCamera()

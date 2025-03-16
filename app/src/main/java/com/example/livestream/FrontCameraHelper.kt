@@ -13,17 +13,17 @@ import android.view.SurfaceView
 import androidx.core.content.ContextCompat
 import java.util.*
 
-class FrontCameraHelper(
+open class FrontCameraHelper(
     private val context: Context,
     private val surfaceView: SurfaceView,
-    private val width: Int = 640,
-    private val height: Int = 480
+    val width: Int = 640,
+    val height: Int = 480
 ) {
     private val TAG = "FrontCameraHelper"
 
     private var cameraDevice: CameraDevice? = null
     private var cameraCaptureSession: CameraCaptureSession? = null
-    private lateinit var previewRequestBuilder: CaptureRequest.Builder
+    lateinit var previewRequestBuilder: CaptureRequest.Builder
     private lateinit var previewRequest: CaptureRequest
 
     private val cameraManager: CameraManager by lazy {
@@ -31,7 +31,7 @@ class FrontCameraHelper(
     }
 
     private lateinit var cameraId: String
-    private lateinit var backgroundHandler: Handler
+    lateinit var backgroundHandler: Handler
     private lateinit var backgroundThread: HandlerThread
 
     // Camera state callback
@@ -128,7 +128,7 @@ class FrontCameraHelper(
         }
     }
 
-    private fun createCameraPreviewSession() {
+    open fun createCameraPreviewSession() {
         try {
             val surface = surfaceView.holder.surface
 
